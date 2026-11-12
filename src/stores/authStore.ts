@@ -1,72 +1,60 @@
 import { writable } from 'svelte/store';
 import type { AuthState, User, UserRole } from '../types/auth';
 
-const SESSION_STORAGE_KEY = 'sibermu_auth_session';
-const USERS_REGISTRY_KEY = 'sibermu_users_registry';
+const SESSION_KEY = 'sibermu_auth_session';
+const USERS_KEY = 'sibermu_users_registry';
 
 export interface RegisteredAccount extends User {
   password: string;
 }
 
-// Data akun resmi bawaan yang terdaftar di sistem
 export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
   {
-    id: 'usr-mhs-01',
-    username: '230101001',
+    id: 'usr-student',
+    name: 'MAHASISWA',
+    identifierNumber: '230101001',
     password: 'password123',
-    name: 'Ahmad Fauzan Syahputra',
-    email: 'fauzan.mhs@sibermu.ac.id',
-    role: 'mahasiswa',
-    identifierNumber: '230101001', // NIK / NIM Mahasiswa
-    department: 'S1 Informatika',
-    semester: 4,
-    avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ahmad+Fauzan'
+    role: 'student',
+    email: 'student@sibermu.ac.id',
+    department: 'Informatics Engineering',
+    semester: 4
   },
   {
-    id: 'usr-dsn-01',
-    username: '0612048501',
+    id: 'usr-lecturer',
+    name: 'DOSEN',
+    identifierNumber: '0612048501',
     password: 'password123',
-    name: 'Dr. Ir. Muhammad Arifin, M.Kom.',
-    email: 'm.arifin@sibermu.ac.id',
-    role: 'dosen',
-    identifierNumber: '0612048501', // NIK / NIDN Dosen
-    department: 'S1 Informatika',
-    avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Muhammad+Arifin'
+    role: 'lecturer',
+    email: 'lecturer@sibermu.ac.id',
+    department: 'Informatics Engineering'
   }
 ];
 
 function getStoredUsers(): RegisteredAccount[] {
-  // Gunakan Map agar akun resmi selalu tersedia & akun custom tetap terjaga
-  const userMap = new Map<string, RegisteredAccount>();
-
-  // 1. Selalu daftarkan akun resmi
+  const map = new Map<string, RegisteredAccount>();
   for (const acc of REGISTERED_ACCOUNTS) {
-    userMap.set(acc.identifierNumber.trim().toLowerCase(), acc);
+    map.set(acc.identifierNumber.toLowerCase(), acc);
   }
 
-  // 2. Baca dan gabungkan akun dari localStorage jika ada
   try {
-    const raw = localStorage.getItem(USERS_REGISTRY_KEY);
+    const raw = localStorage.getItem(USERS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         for (const item of parsed) {
-          if (item && item.identifierNumber) {
-            const key = item.identifierNumber.trim().toLowerCase();
-            if (!userMap.has(key)) {
-              userMap.set(key, item);
-            }
+          if (item?.identifierNumber && !map.has(item.identifierNumber.toLowerCase())) {
+            map.set(item.identifierNumber.toLowerCase(), item);
           }
         }
       }
     }
   } catch (err) {
-    console.error('Gagal membaca data pengguna:', err);
+    console.error(err);
   }
 
-  const list = Array.from(userMap.values());
+  const list = Array.from(map.values());
   try {
-    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(list));
+    localStorage.setItem(USERS_KEY, JSON.stringify(list));
   } catch (e) {
     console.error(e);
   }
@@ -75,24 +63,17 @@ function getStoredUsers(): RegisteredAccount[] {
 
 function getInitialSession(): AuthState {
   try {
-    const saved = localStorage.getItem(SESSION_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.currentUser) {
-        return {
-          isAuthenticated: true,
-          currentUser: parsed.currentUser,
-          token: parsed.token || `token-${Date.now()}`
-        };
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.currentUser) {
+        return { isAuthenticated: true, currentUser: parsed.currentUser };
       }
     }
   } catch (err) {
-    console.error('Gagal membaca sesi:', err);
+    console.error(err);
   }
-  return {
-    isAuthenticated: false,
-    currentUser: null
-  };
+  return { isAuthenticated: false, currentUser: null };
 }
 
 function createAuthStore() {
@@ -101,77 +82,34 @@ function createAuthStore() {
   return {
     subscribe,
 
-    // Login hanya dengan NIK dan Role yang sudah terdaftar
-    loginWithNikAndRole: (
-      nikInput: string,
-      passwordInput: string,
-      roleInput: UserRole
-    ): { success: boolean; message: string; user?: User } => {
+    login: (idNumber: string, passwordInput: string, roleInput: UserRole) => {
       const users = getStoredUsers();
-      const trimmedNik = nikInput.trim().toLowerCase();
+      const trimmed = idNumber.trim().toLowerCase();
 
-      // Cari user berdasarkan NIK / NIM / NIDN dan peran yang dipilih
       const matched = users.find(
-        (acc) =>
-          (acc.identifierNumber.trim().toLowerCase() === trimmedNik ||
-            acc.username.trim().toLowerCase() === trimmedNik) &&
-          acc.role === roleInput
+        (u) => u.identifierNumber.toLowerCase() === trimmed && u.role === roleInput
       );
 
       if (!matched) {
-        return {
-          success: false,
-          message: 'Nomor Induk tidak terdaftar di sistem.'
-        };
+        return { success: false, message: 'ID number is not registered for this role.' };
       }
 
-      // Validasi kata sandi
       if (matched.password !== passwordInput) {
-        return {
-          success: false,
-          message: 'Kata sandi tidak sesuai. Silakan periksa kembali.'
-        };
+        return { success: false, message: 'Incorrect password. Please try again.' };
       }
 
-      const { password, ...userProfile } = matched;
-      const newState: AuthState = {
-        isAuthenticated: true,
-        currentUser: userProfile,
-        token: `session-${Date.now()}`
-      };
-
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newState));
-      set(newState);
-
-      return {
-        success: true,
-        message: `Selamat datang, ${userProfile.name}!`,
-        user: userProfile
-      };
+      const { password, ...profile } = matched;
+      const state: AuthState = { isAuthenticated: true, currentUser: profile };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+      set(state);
+      return { success: true, message: `Welcome, ${profile.name}!` };
     },
 
-    // Tambah akun langsung (jika user ingin mendaftarkan NIK aslinya)
-    registerDirectAccount: (acc: RegisteredAccount) => {
-      const users = getStoredUsers();
-      users.push(acc);
-      try {
-        localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(users));
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
-    // Logout
     logout: () => {
-      localStorage.removeItem(SESSION_STORAGE_KEY);
+      localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('sibermu_active_tab');
-      if (typeof window !== 'undefined') {
-        window.location.hash = '';
-      }
-      set({
-        isAuthenticated: false,
-        currentUser: null
-      });
+      if (typeof window !== 'undefined') window.location.hash = '';
+      set({ isAuthenticated: false, currentUser: null });
     }
   };
 }

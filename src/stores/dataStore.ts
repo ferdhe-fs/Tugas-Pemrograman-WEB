@@ -1,91 +1,137 @@
 import { writable } from 'svelte/store';
-import type { Course } from '../types/academic';
+import type { Course, SemesterTranscript } from '../types/academic';
 
-const COURSES_STORAGE_KEY = 'sibermu_academic_courses';
+const COURSES_KEY = 'sibermu_academic_courses';
 
-export const INITIAL_DEMO_COURSES: Course[] = [
+export const INITIAL_COURSES: Course[] = [
   {
-    id: 'crs-001',
+    id: 'crs-1',
     code: 'IF201',
-    name: 'Pemrograman Berbasis Web',
-    sks: 3,
-    lecturer: 'Dr. Ir. Muhammad Arifin, M.Kom.',
-    day: 'Senin',
+    name: 'Web Application Development',
+    credits: 3,
+    lecturer: 'DOSEN',
+    day: 'Monday',
     time: '08:00 - 10:30',
-    room: 'LMS SiberMu (Online)',
-    status: 'Disetujui',
-    studentName: 'Ahmad Fauzan Syahputra',
+    room: 'SiberMu LMS (Online)',
+    status: 'Approved',
+    studentName: 'MAHASISWA',
     studentId: '230101001'
   },
   {
-    id: 'crs-002',
+    id: 'crs-2',
     code: 'IF203',
-    name: 'Basis Data & SQL Terapan',
-    sks: 3,
-    lecturer: 'Dewi Rahmawati, M.Cs.',
-    day: 'Selasa',
+    name: 'Database Systems & SQL',
+    credits: 3,
+    lecturer: 'DOSEN',
+    day: 'Tuesday',
     time: '10:45 - 13:15',
-    room: 'LMS SiberMu (Online)',
-    status: 'Disetujui',
-    studentName: 'Ahmad Fauzan Syahputra',
+    room: 'SiberMu LMS (Online)',
+    status: 'Approved',
+    studentName: 'MAHASISWA',
     studentId: '230101001'
   },
   {
-    id: 'crs-003',
+    id: 'crs-3',
     code: 'IF205',
-    name: 'Rekayasa Perangkat Lunak',
-    sks: 3,
-    lecturer: 'Dr. Ir. Muhammad Arifin, M.Kom.',
-    day: 'Rabu',
+    name: 'Software Engineering',
+    credits: 3,
+    lecturer: 'DOSEN',
+    day: 'Wednesday',
     time: '13:30 - 16:00',
-    room: 'LMS SiberMu (Online)',
-    status: 'Menunggu',
-    studentName: 'Ahmad Fauzan Syahputra',
+    room: 'SiberMu LMS (Online)',
+    status: 'Pending',
+    studentName: 'MAHASISWA',
     studentId: '230101001'
   },
   {
-    id: 'crs-004',
+    id: 'crs-4',
     code: 'IF207',
-    name: 'Keamanan Siber & Jaringan',
-    sks: 3,
-    lecturer: 'Hadi Pranoto, M.T.',
-    day: 'Kamis',
+    name: 'Cybersecurity & Computer Networks',
+    credits: 3,
+    lecturer: 'DOSEN',
+    day: 'Thursday',
     time: '09:00 - 11:30',
-    room: 'LMS SiberMu (Online)',
-    status: 'Menunggu',
-    studentName: 'Ahmad Fauzan Syahputra',
+    room: 'SiberMu LMS (Online)',
+    status: 'Pending',
+    studentName: 'MAHASISWA',
     studentId: '230101001'
+  }
+];
+
+// Transkrip Nilai per Semester
+export const SEMESTER_TRANSCRIPTS: SemesterTranscript[] = [
+  {
+    semester: 1,
+    academicYear: '2024/2025 Odd',
+    semesterGpa: 3.85,
+    totalCredits: 20,
+    courses: [
+      { code: 'IF101', name: 'Introduction to Computer Science', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF102', name: 'Algorithms & Programming', credits: 4, grade: 'A', point: 4.0 },
+      { code: 'IF103', name: 'Discrete Mathematics', credits: 3, grade: 'A-', point: 3.75 },
+      { code: 'UN101', name: 'Islamic Studies & Ethics', credits: 2, grade: 'A', point: 4.0 },
+      { code: 'UN102', name: 'Civic Education', credits: 2, grade: 'B+', point: 3.5 },
+      { code: 'UN103', name: 'English for Academic Purposes', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF104', name: 'Computer Hardware Fundamentals', credits: 3, grade: 'A-', point: 3.75 }
+    ]
+  },
+  {
+    semester: 2,
+    academicYear: '2024/2025 Even',
+    semesterGpa: 3.78,
+    totalCredits: 21,
+    courses: [
+      { code: 'IF105', name: 'Object-Oriented Programming', credits: 4, grade: 'A', point: 4.0 },
+      { code: 'IF106', name: 'Data Structures', credits: 4, grade: 'A-', point: 3.75 },
+      { code: 'IF107', name: 'Computer Organization & Architecture', credits: 3, grade: 'B+', point: 3.5 },
+      { code: 'IF108', name: 'Linear Algebra & Matrices', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF109', name: 'Operating Systems', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'UN104', name: 'Bahasa Indonesia', credits: 2, grade: 'A', point: 4.0 },
+      { code: 'UN105', name: 'Muhammadiyah Studies', credits: 2, grade: 'A', point: 4.0 }
+    ]
+  },
+  {
+    semester: 3,
+    academicYear: '2025/2026 Odd',
+    semesterGpa: 3.90,
+    totalCredits: 20,
+    courses: [
+      { code: 'IF201', name: 'Web Application Development', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF202', name: 'Artificial Intelligence Basics', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF203', name: 'Database Systems & SQL', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF204', name: 'Statistics & Probability', credits: 3, grade: 'A-', point: 3.75 },
+      { code: 'IF205', name: 'Human-Computer Interaction', credits: 3, grade: 'A', point: 4.0 },
+      { code: 'IF206', name: 'Formal Languages & Automata', credits: 3, grade: 'B+', point: 3.5 },
+      { code: 'UN106', name: 'Digital Entrepreneurship', credits: 2, grade: 'A', point: 4.0 }
+    ]
   }
 ];
 
 function getStoredCourses(): Course[] {
   try {
-    const raw = localStorage.getItem(COURSES_STORAGE_KEY);
+    const raw = localStorage.getItem(COURSES_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (err) {
-    console.error('Gagal membaca data mata kuliah:', err);
+    console.error(err);
   }
-  // Pasang data dummy sementara jika kosong
   try {
-    localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(INITIAL_DEMO_COURSES));
+    localStorage.setItem(COURSES_KEY, JSON.stringify(INITIAL_COURSES));
   } catch (e) {
     console.error(e);
   }
-  return INITIAL_DEMO_COURSES;
+  return INITIAL_COURSES;
 }
 
 export const courseStore = writable<Course[]>(getStoredCourses());
 
-courseStore.subscribe((courses) => {
+courseStore.subscribe((val) => {
   try {
-    localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(courses));
-  } catch (err) {
-    console.error('Gagal menyimpan mata kuliah:', err);
+    localStorage.setItem(COURSES_KEY, JSON.stringify(val));
+  } catch (e) {
+    console.error(e);
   }
 });
 
@@ -93,29 +139,17 @@ export function addCourse(newCourse: Omit<Course, 'id' | 'status'>): void {
   const item: Course = {
     ...newCourse,
     id: `crs-${Date.now()}`,
-    status: 'Menunggu'
+    status: 'Pending'
   };
   courseStore.update((list) => [item, ...list]);
 }
 
-export function deleteCourse(courseId: string): void {
-  courseStore.update((list) => list.filter((c) => c.id !== courseId));
+export function deleteCourse(id: string): void {
+  courseStore.update((list) => list.filter((c) => c.id !== id));
 }
 
-export function setCourseStatus(courseId: string, status: 'Disetujui' | 'Menunggu'): void {
+export function setCourseStatus(id: string, status: 'Approved' | 'Pending'): void {
   courseStore.update((list) =>
-    list.map((c) => (c.id === courseId ? { ...c, status } : c))
-  );
-}
-
-export function toggleCourseStatus(courseId: string): void {
-  courseStore.update((courses) =>
-    courses.map((c) => {
-      if (c.id === courseId) {
-        const nextStatus = c.status === 'Disetujui' ? 'Menunggu' : 'Disetujui';
-        return { ...c, status: nextStatus };
-      }
-      return c;
-    })
+    list.map((c) => (c.id === id ? { ...c, status } : c))
   );
 }

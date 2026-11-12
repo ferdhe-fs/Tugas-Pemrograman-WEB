@@ -2,13 +2,11 @@
   import { authStore, REGISTERED_ACCOUNTS } from '../stores/authStore';
   import type { UserRole } from '../types/auth';
 
-  // Input states
-  let selectedRole = $state<UserRole>('mahasiswa');
-  let inputNik = $state('');
+  let selectedRole = $state<UserRole>('student');
+  let inputId = $state('');
   let inputPass = $state('');
   let showPassword = $state(false);
 
-  // Feedback states
   let errorMessage = $state('');
   let isLoading = $state(false);
 
@@ -16,14 +14,14 @@
     e.preventDefault();
     errorMessage = '';
 
-    if (!inputNik.trim() || !inputPass.trim()) {
-      errorMessage = 'Mohon isi NIK / Nomor Induk dan Kata Sandi.';
+    if (!inputId.trim() || !inputPass.trim()) {
+      errorMessage = 'Please provide your ID Number and Password.';
       return;
     }
 
     isLoading = true;
     setTimeout(() => {
-      const res = authStore.loginWithNikAndRole(inputNik, inputPass, selectedRole);
+      const res = authStore.login(inputId, inputPass, selectedRole);
       isLoading = false;
       if (!res.success) {
         errorMessage = res.message;
@@ -31,12 +29,11 @@
     }, 250);
   }
 
-  // Quick fill bantuan pengujian akun terdaftar
   function quickFill(role: UserRole) {
     const account = REGISTERED_ACCOUNTS.find((a) => a.role === role);
     if (account) {
       selectedRole = role;
-      inputNik = account.identifierNumber;
+      inputId = account.identifierNumber;
       inputPass = account.password;
       errorMessage = '';
     }
@@ -45,16 +42,14 @@
 
 <div class="login-wrapper">
   <div class="login-card-simple p-4 p-sm-5">
-    <!-- Header Logo & Kampus -->
     <div class="text-center mb-4">
       <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 shadow-sm" style="width: 52px; height: 52px;">
         <i class="bi bi-mortarboard-fill fs-4"></i>
       </div>
       <h4 class="fw-bold mb-1 text-dark">SIAKAD SiberMu</h4>
-      <p class="text-muted small mb-0">Universitas Siber Muhammadiyah</p>
+      <p class="text-muted small mb-0">Cyber Muhammadiyah University</p>
     </div>
 
-    <!-- Alert Kesalahan -->
     {#if errorMessage}
       <div class="alert alert-danger py-2 px-3 small d-flex align-items-center gap-2 mb-3" role="alert">
         <i class="bi bi-exclamation-circle-fill"></i>
@@ -62,75 +57,74 @@
       </div>
     {/if}
 
-    <!-- FORM LOGIN HANYA NIK & ROLE TERDAFTAR -->
     <form onsubmit={handleLogin}>
-      <!-- Pilihan Peran Akun -->
+      <!-- Role Selector -->
       <div class="mb-3">
-        <label for="roleMahasiswa" class="form-label small fw-semibold text-secondary d-block">
-          Peran Akun
+        <label for="roleStudent" class="form-label small fw-semibold text-secondary d-block">
+          Account Role
         </label>
         <div class="btn-group w-100" role="group">
           <input
             type="radio"
             class="btn-check"
             name="roleOption"
-            id="roleMahasiswa"
-            value="mahasiswa"
-            checked={selectedRole === 'mahasiswa'}
-            onchange={() => (selectedRole = 'mahasiswa')}
+            id="roleStudent"
+            value="student"
+            checked={selectedRole === 'student'}
+            onchange={() => (selectedRole = 'student')}
           />
-          <label class="btn btn-outline-primary btn-sm py-2" for="roleMahasiswa">
-            <i class="bi bi-person me-1"></i> Mahasiswa
+          <label class="btn btn-outline-primary btn-sm py-2" for="roleStudent">
+            <i class="bi bi-person me-1"></i> Student
           </label>
 
           <input
             type="radio"
             class="btn-check"
             name="roleOption"
-            id="roleDosen"
-            value="dosen"
-            checked={selectedRole === 'dosen'}
-            onchange={() => (selectedRole = 'dosen')}
+            id="roleLecturer"
+            value="lecturer"
+            checked={selectedRole === 'lecturer'}
+            onchange={() => (selectedRole = 'lecturer')}
           />
-          <label class="btn btn-outline-primary btn-sm py-2" for="roleDosen">
-            <i class="bi bi-person-workspace me-1"></i> Dosen
+          <label class="btn btn-outline-primary btn-sm py-2" for="roleLecturer">
+            <i class="bi bi-person-workspace me-1"></i> Lecturer
           </label>
         </div>
       </div>
 
-      <!-- Input NIK / Nomor Induk -->
+      <!-- ID Number Input -->
       <div class="mb-3">
-        <label for="inputNik" class="form-label small fw-semibold text-secondary">
-          {selectedRole === 'dosen' ? 'NIDN / NIP / NIK Dosen' : 'NIM / NIK Mahasiswa'}
+        <label for="inputId" class="form-label small fw-semibold text-secondary">
+          {selectedRole === 'lecturer' ? 'Lecturer ID (NIDN)' : 'Student ID (NIM)'}
         </label>
         <input
-          id="inputNik"
+          id="inputId"
           type="text"
           class="form-control"
-          placeholder={selectedRole === 'dosen' ? 'Masukkan NIDN dosen terdaftar' : 'Masukkan NIM mahasiswa terdaftar'}
-          bind:value={inputNik}
+          placeholder={selectedRole === 'lecturer' ? 'Enter lecturer ID number' : 'Enter student ID number'}
+          bind:value={inputId}
           required
         />
       </div>
 
-      <!-- Input Kata Sandi -->
+      <!-- Password Input -->
       <div class="mb-4">
         <label for="inputPass" class="form-label small fw-semibold text-secondary">
-          Kata Sandi
+          Password
         </label>
         <div class="input-group password-field-group">
           <input
             id="inputPass"
             type={showPassword ? 'text' : 'password'}
             class="form-control"
-            placeholder="Masukkan kata sandi"
+            placeholder="Enter your password"
             bind:value={inputPass}
             required
           />
           <button
             type="button"
             class="btn-toggle-eye"
-            aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
             onclick={() => (showPassword = !showPassword)}
           >
             <i class={showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'}></i>
@@ -138,7 +132,7 @@
         </div>
       </div>
 
-      <!-- Tombol Masuk -->
+      <!-- Submit Button -->
       <button
         type="submit"
         class="btn btn-primary w-100 py-2 fw-semibold"
@@ -146,33 +140,33 @@
       >
         {#if isLoading}
           <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-          Memverifikasi...
+          Authenticating...
         {:else}
-          Masuk ke Sistem
+          Sign In
         {/if}
       </button>
 
-      <!-- Informasi Akun Terdaftar untuk Pengujian -->
+      <!-- Quick Demo Login Helpers -->
       <div class="mt-4 pt-3 border-top text-center">
         <div class="text-muted small mb-2" style="font-size: 0.72rem;">
-          Akun Terdaftar di Sistem (Klik untuk uji coba):
+          Registered Accounts (Click to autofill):
         </div>
         <div class="d-flex justify-content-center gap-2">
           <button
             type="button"
             class="btn btn-sm btn-outline-primary py-1 px-2"
             style="font-size: 0.75rem;"
-            onclick={() => quickFill('mahasiswa')}
+            onclick={() => quickFill('student')}
           >
-            <i class="bi bi-person-fill me-1"></i> Mahasiswa (230101001)
+            <i class="bi bi-person-fill me-1"></i> Student (230101001)
           </button>
           <button
             type="button"
             class="btn btn-sm btn-outline-secondary py-1 px-2"
             style="font-size: 0.75rem;"
-            onclick={() => quickFill('dosen')}
+            onclick={() => quickFill('lecturer')}
           >
-            <i class="bi bi-person-workspace me-1"></i> Dosen (0612048501)
+            <i class="bi bi-person-workspace me-1"></i> Lecturer (0612048501)
           </button>
         </div>
       </div>

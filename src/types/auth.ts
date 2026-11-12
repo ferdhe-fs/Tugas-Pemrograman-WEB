@@ -1,13 +1,11 @@
-export type UserRole = 'mahasiswa' | 'dosen' | 'admin';
+export type UserRole = 'student' | 'lecturer';
 
 export interface User {
   id: string;
-  username: string;
   name: string;
+  identifierNumber: string;
   email: string;
   role: UserRole;
-  avatarUrl: string;
-  identifierNumber: string; // NIM atau NIDN
   department: string;
   semester?: number;
 }
