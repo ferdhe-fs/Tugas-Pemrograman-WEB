@@ -45,10 +45,10 @@
 
   let roleLabel = $derived(
     user.role === 'dosen'
-      ? 'Portal Dosen'
+      ? 'Dosen'
       : user.role === 'admin'
-        ? 'Portal BAA'
-        : 'Portal Mahasiswa'
+        ? 'BAA'
+        : 'Mahasiswa'
   );
 
   function handleLogout() {

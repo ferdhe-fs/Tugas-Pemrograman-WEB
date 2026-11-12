@@ -342,7 +342,7 @@
     {#if activeTab === 'overview'}
       <!-- Overview Dosen -->
       <div class="mb-4">
-        <h5 class="fw-bold text-dark mb-1">Portal Dosen Pengampu & Pembimbing</h5>
+        <h5 class="fw-bold text-dark mb-1">Dosen Pengampu & Pembimbing</h5>
         <p class="text-muted small mb-0">Selamat datang, {user.name} ({user.identifierNumber})</p>
       </div>
 
