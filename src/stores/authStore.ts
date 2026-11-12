@@ -110,26 +110,18 @@ function createAuthStore() {
       const users = getStoredUsers();
       const trimmedNik = nikInput.trim().toLowerCase();
 
-      // Cari user berdasarkan NIK / NIM / NIDN
+      // Cari user berdasarkan NIK / NIM / NIDN dan peran yang dipilih
       const matched = users.find(
         (acc) =>
-          acc.identifierNumber.trim().toLowerCase() === trimmedNik ||
-          acc.username.trim().toLowerCase() === trimmedNik
+          (acc.identifierNumber.trim().toLowerCase() === trimmedNik ||
+            acc.username.trim().toLowerCase() === trimmedNik) &&
+          acc.role === roleInput
       );
 
       if (!matched) {
         return {
           success: false,
-          message: `Nomor Induk (${nikInput}) belum terdaftar di sistem SIAKAD.`
-        };
-      }
-
-      // Validasi kesesuaian peran
-      if (matched.role !== roleInput) {
-        const roleLabel = matched.role === 'dosen' ? 'Dosen' : 'Mahasiswa';
-        return {
-          success: false,
-          message: `Nomor Induk ${matched.identifierNumber} terdaftar sebagai ${roleLabel}. Silakan pilih tombol peran "${roleLabel}" di atas.`
+          message: 'Nomor Induk tidak terdaftar di sistem.'
         };
       }
 
