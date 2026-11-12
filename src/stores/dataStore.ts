@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { Course, SemesterTranscript } from '../types/academic';
 
 const COURSES_KEY = 'sibermu_academic_courses';
@@ -15,7 +15,8 @@ export const INITIAL_COURSES: Course[] = [
     room: 'SiberMu LMS (Online)',
     status: 'Approved',
     studentName: 'MAHASISWA',
-    studentId: '230101001'
+    studentId: '230101001',
+    semester: 4
   },
   {
     id: 'crs-2',
@@ -28,7 +29,8 @@ export const INITIAL_COURSES: Course[] = [
     room: 'SiberMu LMS (Online)',
     status: 'Approved',
     studentName: 'MAHASISWA',
-    studentId: '230101001'
+    studentId: '230101001',
+    semester: 4
   },
   {
     id: 'crs-3',
@@ -41,7 +43,8 @@ export const INITIAL_COURSES: Course[] = [
     room: 'SiberMu LMS (Online)',
     status: 'Pending',
     studentName: 'MAHASISWA',
-    studentId: '230101001'
+    studentId: '230101001',
+    semester: 4
   },
   {
     id: 'crs-4',
@@ -54,17 +57,16 @@ export const INITIAL_COURSES: Course[] = [
     room: 'SiberMu LMS (Online)',
     status: 'Pending',
     studentName: 'MAHASISWA',
-    studentId: '230101001'
+    studentId: '230101001',
+    semester: 4
   }
 ];
 
-// Transkrip Nilai per Semester
-export const SEMESTER_TRANSCRIPTS: SemesterTranscript[] = [
+// Raw transcript grade data with dynamic calculation
+export const INITIAL_SEMESTERS_DATA: Omit<SemesterTranscript, 'semesterGpa' | 'totalCredits'>[] = [
   {
     semester: 1,
     academicYear: '2024/2025 Odd',
-    semesterGpa: 3.85,
-    totalCredits: 20,
     courses: [
       { code: 'IF101', name: 'Introduction to Computer Science', credits: 3, grade: 'A', point: 4.0 },
       { code: 'IF102', name: 'Algorithms & Programming', credits: 4, grade: 'A', point: 4.0 },
@@ -78,8 +80,6 @@ export const SEMESTER_TRANSCRIPTS: SemesterTranscript[] = [
   {
     semester: 2,
     academicYear: '2024/2025 Even',
-    semesterGpa: 3.78,
-    totalCredits: 21,
     courses: [
       { code: 'IF105', name: 'Object-Oriented Programming', credits: 4, grade: 'A', point: 4.0 },
       { code: 'IF106', name: 'Data Structures', credits: 4, grade: 'A-', point: 3.75 },
@@ -93,8 +93,6 @@ export const SEMESTER_TRANSCRIPTS: SemesterTranscript[] = [
   {
     semester: 3,
     academicYear: '2025/2026 Odd',
-    semesterGpa: 3.90,
-    totalCredits: 20,
     courses: [
       { code: 'IF201', name: 'Web Application Development', credits: 3, grade: 'A', point: 4.0 },
       { code: 'IF202', name: 'Artificial Intelligence Basics', credits: 3, grade: 'A', point: 4.0 },
@@ -106,6 +104,20 @@ export const SEMESTER_TRANSCRIPTS: SemesterTranscript[] = [
     ]
   }
 ];
+
+// Helper kalkulasi dinamis transkrip
+export function computeTranscripts(): SemesterTranscript[] {
+  return INITIAL_SEMESTERS_DATA.map((sem) => {
+    const totalCredits = sem.courses.reduce((sum, c) => sum + c.credits, 0);
+    const totalPoints = sem.courses.reduce((sum, c) => sum + c.credits * c.point, 0);
+    const semesterGpa = totalCredits > 0 ? Number((totalPoints / totalCredits).toFixed(2)) : 0;
+    return {
+      ...sem,
+      totalCredits,
+      semesterGpa
+    };
+  });
+}
 
 function getStoredCourses(): Course[] {
   try {
@@ -134,6 +146,23 @@ courseStore.subscribe((val) => {
     console.error(e);
   }
 });
+
+// Derived Stores Dinamis
+export const totalCreditsStore = derived(courseStore, ($courses) =>
+  $courses.reduce((sum, c) => sum + c.credits, 0)
+);
+
+export const approvedCreditsStore = derived(courseStore, ($courses) =>
+  $courses.filter((c) => c.status === 'Approved').reduce((sum, c) => sum + c.credits, 0)
+);
+
+export const pendingCoursesStore = derived(courseStore, ($courses) =>
+  $courses.filter((c) => c.status === 'Pending')
+);
+
+export const approvedCoursesStore = derived(courseStore, ($courses) =>
+  $courses.filter((c) => c.status === 'Approved')
+);
 
 export function addCourse(newCourse: Omit<Course, 'id' | 'status'>): void {
   const item: Course = {
