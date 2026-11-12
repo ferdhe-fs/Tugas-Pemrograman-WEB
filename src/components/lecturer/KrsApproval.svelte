@@ -20,7 +20,15 @@
 
 <div class="card card-simple overflow-hidden">
   <div class="table-responsive">
-    <table class="table table-simple">
+    <table class="table table-simple table-fixed align-middle">
+      <colgroup>
+        <col style="width: 22%;" />
+        <col style="width: 32%;" />
+        <col style="width: 10%;" />
+        <col style="width: 16%;" />
+        <col style="width: 10%;" />
+        <col style="width: 10%;" />
+      </colgroup>
       <thead>
         <tr>
           <th>Student (Applicant)</th>
@@ -42,11 +50,11 @@
           {#each filteredCourses as c (c.id)}
             <tr>
               <td>
-                <div class="fw-semibold text-dark">{c.studentName || 'MAHASISWA'}</div>
+                <div class="fw-semibold text-dark text-truncate">{c.studentName || 'MAHASISWA'}</div>
                 <small class="text-muted font-monospace">{c.studentId || '-'}</small>
               </td>
               <td>
-                <div class="fw-semibold text-dark">{c.name}</div>
+                <div class="fw-semibold text-dark text-truncate" title={c.name}>{c.name}</div>
                 <small class="text-muted font-monospace">{c.code}</small>
               </td>
               <td>{c.credits} SKS</td>

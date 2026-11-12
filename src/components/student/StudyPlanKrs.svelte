@@ -78,7 +78,16 @@
   </div>
 
   <div class="table-responsive">
-    <table class="table table-simple">
+    <table class="table table-simple table-fixed align-middle">
+      <colgroup>
+        <col style="width: 12%;" />
+        <col style="width: 30%;" />
+        <col style="width: 11%;" />
+        <col style="width: 14%;" />
+        <col style="width: 17%;" />
+        <col style="width: 10%;" />
+        <col style="width: 6%;" />
+      </colgroup>
       <thead>
         <tr>
           <th>Code</th>
@@ -101,7 +110,7 @@
           {#each filteredCourses as c (c.id)}
             <tr>
               <td class="font-monospace small text-muted">{c.code}</td>
-              <td class="fw-semibold text-dark">{c.name}</td>
+              <td class="fw-semibold text-dark text-truncate" title={c.name}>{c.name}</td>
               <td>{c.credits} SKS</td>
               <td class="small text-secondary">{c.lecturer}</td>
               <td class="small text-muted">{c.day}, {c.time}</td>

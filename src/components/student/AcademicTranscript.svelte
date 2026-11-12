@@ -74,7 +74,15 @@
   </div>
 
   <div class="table-responsive">
-    <table class="table table-simple align-middle">
+    <table class="table table-simple table-fixed align-middle">
+      <colgroup>
+        <col style="width: 7%;" />
+        <col style="width: 18%;" />
+        <col style="width: 38%;" />
+        <col style="width: 15%;" />
+        <col style="width: 11%;" />
+        <col style="width: 11%;" />
+      </colgroup>
       <thead>
         <tr>
           <th class="text-start">No</th>
@@ -90,7 +98,7 @@
           <tr>
             <td class="text-start text-muted small">{idx + 1}</td>
             <td class="text-start font-monospace small text-muted">{crs.code}</td>
-            <td class="text-start fw-semibold text-dark">{crs.name}</td>
+            <td class="text-start fw-semibold text-dark text-truncate" title={crs.name}>{crs.name}</td>
             <td class="text-start">{crs.credits}</td>
             <td class="text-start">
               <span class="badge badge-clean-primary px-2 py-1">{crs.grade}</span>

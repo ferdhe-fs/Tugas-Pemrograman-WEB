@@ -353,6 +353,18 @@ body {
   border-bottom: none;
 }
 
+/* Fixed Table Layout to Prevent Column Shift/Overflow */
+.table-fixed {
+  table-layout: fixed !important;
+  width: 100%;
+}
+
+.table-fixed th,
+.table-fixed td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 768px) {
   .app-sidebar {
     position: fixed;
