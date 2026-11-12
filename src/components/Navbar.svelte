@@ -9,67 +9,41 @@
   let { user }: Props = $props();
 
   function handleLogout() {
-    if (confirm('Apakah Anda yakin ingin keluar dari sistem SIAKAD Siber Muhammadiyah?')) {
+    if (confirm('Keluar dari sistem?')) {
       authStore.logout();
-    }
-  }
-
-  function getBadgeColor(role: string): string {
-    switch (role) {
-      case 'admin':
-        return 'bg-danger-subtle text-danger border border-danger-subtle';
-      case 'dosen':
-        return 'bg-success-subtle text-success border border-success-subtle';
-      default:
-        return 'bg-primary-subtle text-primary border border-primary-subtle';
     }
   }
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2 px-3 px-lg-4 shadow-sm">
-  <div class="container-fluid px-0">
-    <!-- Brand Siber Muhammadiyah -->
-    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary" href="#dashboard">
-      <span class="badge bg-primary text-white p-2 rounded-3">
-        <i class="bi bi-mortarboard-fill fs-5"></i>
-      </span>
-      <div>
-        <div class="fs-6 fw-bold tracking-wide text-dark lh-1">SIAKAD SiberMu</div>
-        <small class="text-muted fw-normal" style="font-size: 0.7rem;">Universitas Siber Muhammadiyah</small>
-      </div>
-    </a>
-
-    <!-- Right Controls -->
-    <div class="d-flex align-items-center gap-3 ms-auto">
-      <!-- User Profile -->
-      <div class="d-flex align-items-center gap-2 ps-2">
-        <img
-          src={user.avatarUrl}
-          alt={user.name}
-          class="rounded-circle border"
-          width="38"
-          height="38"
-        />
-        <div class="d-none d-md-block text-start lh-sm">
-          <div class="fw-semibold text-dark small">{user.name}</div>
-          <div class="d-flex align-items-center gap-1 mt-1">
-            <span class="badge rounded-pill text-uppercase {getBadgeColor(user.role)}" style="font-size: 0.65rem;">
-              {user.role}
-            </span>
-            <span class="text-muted" style="font-size: 0.7rem;">&bull; {user.identifierNumber}</span>
-          </div>
+<header class="app-navbar sticky-top">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <!-- Brand Minimalis -->
+      <div class="d-flex align-items-center gap-2">
+        <div class="bg-primary text-white rounded p-1 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+          <i class="bi bi-mortarboard-fill small"></i>
+        </div>
+        <div>
+          <span class="fw-bold text-dark">SIAKAD SiberMu</span>
+          <span class="text-muted small d-none d-sm-inline ms-1">&bull; Universitas Siber Muhammadiyah</span>
         </div>
       </div>
 
-      <!-- Logout Button -->
-      <button
-        class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-3 py-1 ms-1"
-        onclick={handleLogout}
-        title="Keluar dari akun"
-      >
-        <i class="bi bi-box-arrow-right"></i>
-        <span class="d-none d-sm-inline">Logout</span>
-      </button>
+      <!-- User Info & Logout -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-sm-block text-end lh-sm">
+          <div class="fw-semibold text-dark small">{user.name}</div>
+          <div class="text-muted" style="font-size: 0.75rem;">{user.identifierNumber} &bull; <span class="text-capitalize">{user.role}</span></div>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm px-3 py-1"
+          onclick={handleLogout}
+        >
+          Keluar
+        </button>
+      </div>
     </div>
   </div>
-</nav>
+</header>
