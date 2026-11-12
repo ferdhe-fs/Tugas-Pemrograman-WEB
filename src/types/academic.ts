@@ -7,21 +7,17 @@ export interface Course {
   day: string;
   time: string;
   room: string;
-  status: 'Disetujui' | 'Menunggu' | 'Ditolak';
+  status: 'Disetujui' | 'Menunggu';
+  studentName?: string;
+  studentId?: string;
 }
 
-export interface ActivityLog {
+export interface TeachingCourse {
   id: string;
-  action: string;
-  timestamp: string;
-  type: 'info' | 'success' | 'warning' | 'danger';
-}
-
-export interface DashboardMetric {
-  title: string;
-  value: string | number;
-  change: string;
-  isPositive: boolean;
-  icon: string;
-  bgGradient: string;
+  code: string;
+  name: string;
+  sks: number;
+  schedule: string;
+  room: string;
+  totalStudents: number;
 }

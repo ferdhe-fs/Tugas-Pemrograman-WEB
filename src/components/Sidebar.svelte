@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { authStore } from '../stores/authStore';
   import type { User } from '../types/auth';
 
   interface Props {
@@ -9,55 +10,104 @@
 
   let { user, activeTab, onSelectTab }: Props = $props();
 
-  const menuItems = [
-    { id: 'overview', label: 'Ringkasan / Dashboard', icon: 'bi-grid-1x2-fill' },
+  // Menu Mahasiswa
+  const studentMenus = [
+    { id: 'overview', label: 'Ringkasan Studi', icon: 'bi-grid-1x2' },
     { id: 'krs', label: 'Rencana Studi (KRS)', icon: 'bi-journal-check' },
-    { id: 'schedule', label: 'Jadwal Perkuliahan', icon: 'bi-calendar-week' },
-    { id: 'profile', label: 'Biodata & Akun', icon: 'bi-person-circle' }
+    { id: 'schedule', label: 'Jadwal Kuliah', icon: 'bi-calendar3' },
+    { id: 'grades', label: 'Transkrip Nilai (KHS)', icon: 'bi-award' },
+    { id: 'profile', label: 'Biodata Mahasiswa', icon: 'bi-person-vcard' }
   ];
+
+  // Menu Dosen
+  const lecturerMenus = [
+    { id: 'overview', label: 'Ringkasan Mengajar', icon: 'bi-speedometer2' },
+    { id: 'approval', label: 'Validasi KRS Mahasiswa', icon: 'bi-check2-square' },
+    { id: 'courses', label: 'Mata Kuliah Diampu', icon: 'bi-journal-bookmark' },
+    { id: 'schedule', label: 'Jadwal Mengajar', icon: 'bi-calendar-week' },
+    { id: 'profile', label: 'Profil & NIDN', icon: 'bi-person-workspace' }
+  ];
+
+  // Menu Administrator
+  const adminMenus = [
+    { id: 'overview', label: 'Ringkasan Sistem', icon: 'bi-pie-chart' },
+    { id: 'approval', label: 'Semua Data KRS', icon: 'bi-card-checklist' },
+    { id: 'profile', label: 'Profil Administrator', icon: 'bi-shield-check' }
+  ];
+
+  let currentMenus = $derived(
+    user.role === 'dosen'
+      ? lecturerMenus
+      : user.role === 'admin'
+        ? adminMenus
+        : studentMenus
+  );
+
+  let roleLabel = $derived(
+    user.role === 'dosen'
+      ? 'Portal Dosen'
+      : user.role === 'admin'
+        ? 'Portal BAA'
+        : 'Portal Mahasiswa'
+  );
+
+  function handleLogout() {
+    if (confirm('Keluar dari sesi SIAKAD?')) {
+      authStore.logout();
+    }
+  }
 </script>
 
-<aside class="sidebar p-3">
-  <!-- User Card -->
-  <div class="p-3 mb-3 bg-light rounded-3 text-center border">
-    <img
-      src={user.avatarUrl}
-      alt={user.name}
-      class="rounded-circle border border-2 border-white shadow-sm mb-2"
-      width="64"
-      height="64"
-    />
-    <h6 class="fw-bold mb-0 text-truncate">{user.name}</h6>
-    <div class="text-muted small text-truncate">{user.department}</div>
-    <div class="mt-2">
-      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
-        {user.identifierNumber}
-      </span>
+<aside class="app-sidebar">
+  <!-- Brand & Identitas Kampus -->
+  <div class="p-3 border-bottom d-flex align-items-center gap-2">
+    <div class="bg-primary text-white rounded p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+      <i class="bi bi-mortarboard-fill"></i>
+    </div>
+    <div class="lh-1">
+      <div class="fw-bold text-dark" style="font-size: 0.95rem;">SIAKAD SiberMu</div>
+      <small class="text-muted" style="font-size: 0.7rem;">Universitas Siber Muhammadiyah</small>
     </div>
   </div>
 
-  <!-- Navigation Links -->
-  <div class="nav flex-column">
-    <div class="text-uppercase text-muted fw-bold px-3 mb-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">
-      Menu Utama
-    </div>
-    {#each menuItems as item}
+  <!-- Role Subheader -->
+  <div class="px-3 pt-3 pb-1 d-flex align-items-center justify-content-between">
+    <span class="badge badge-clean-primary text-uppercase px-2 py-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">
+      {roleLabel}
+    </span>
+    <small class="text-muted font-monospace" style="font-size: 0.72rem;">{user.identifierNumber}</small>
+  </div>
+
+  <!-- Menu Navigasi Sesuai Role -->
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Menu Utama</div>
+    {#each currentMenus as item}
       <button
         type="button"
-        class="btn border-0 text-start sidebar-link {activeTab === item.id ? 'active' : ''}"
+        class="sidebar-btn {activeTab === item.id ? 'active' : ''}"
         onclick={() => onSelectTab(item.id)}
       >
-        <i class="bi {item.icon} fs-5"></i>
+        <i class="bi {item.icon}"></i>
         <span>{item.label}</span>
       </button>
     {/each}
   </div>
 
-  <div class="mt-4 pt-3 border-top px-3">
-    <div class="small text-muted mb-1">Institusi:</div>
-    <div class="fw-semibold small text-dark mb-2">Universitas Siber Muhammadiyah</div>
-    <div class="badge bg-success-subtle text-success border border-success-subtle w-100 py-2">
-      SIAKAD Aktif
+  <!-- Footer Profil User & Tombol Keluar -->
+  <div class="sidebar-footer">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="text-truncate me-2">
+        <div class="fw-semibold text-dark small text-truncate">{user.name}</div>
+        <div class="text-muted" style="font-size: 0.72rem;">{user.department}</div>
+      </div>
     </div>
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 py-1"
+      onclick={handleLogout}
+    >
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Keluar</span>
+    </button>
   </div>
 </aside>
