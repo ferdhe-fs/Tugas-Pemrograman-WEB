@@ -15,11 +15,34 @@
     return role === 'lecturer' ? lecturerTabs : studentTabs;
   }
 
+  function extractTabFromUrl(hash: string): string {
+    return hash.replace(/^[#/]+/, '').trim();
+  }
+
+  function updatePageTitle(tab?: string, role?: string) {
+    if (typeof document === 'undefined') return;
+    if (!tab) {
+      document.title = 'SIAKAD SiberMu - Sign In';
+      return;
+    }
+    const titles: Record<string, string> = {
+      overview: 'Overview',
+      krs: 'Study Plan (KRS)',
+      schedule: role === 'lecturer' ? 'Teaching Schedule' : 'Course Schedule',
+      transcript: 'Academic Transcript',
+      approval: 'KRS Approval',
+      courses: 'Assigned Courses',
+      profile: role === 'lecturer' ? 'Lecturer Profile' : 'Student Profile'
+    };
+    const title = titles[tab] || 'Dashboard';
+    document.title = `SIAKAD SiberMu - ${title}`;
+  }
+
   function resolveInitialTab(role?: string): string {
     const allowed = getAllowedTabs(role);
     if (typeof window !== 'undefined') {
-      const hash = window.location.hash.replace('#', '').trim();
-      if (hash && allowed.includes(hash)) return hash;
+      const raw = extractTabFromUrl(window.location.hash);
+      if (raw && allowed.includes(raw)) return raw;
       const saved = sessionStorage.getItem(TAB_KEY);
       if (saved && allowed.includes(saved)) return saved;
     }
@@ -36,8 +59,14 @@
       const initial = resolveInitialTab($authStore.currentUser.role);
       activeTab = initial;
       if (typeof window !== 'undefined') {
-        window.location.hash = initial;
+        window.history.replaceState(null, '', '#/' + initial);
         sessionStorage.setItem(TAB_KEY, initial);
+        updatePageTitle(initial, $authStore.currentUser.role);
+      }
+    } else {
+      if (typeof window !== 'undefined') {
+        window.history.replaceState(null, '', window.location.pathname);
+        updatePageTitle();
       }
     }
   });
@@ -47,7 +76,8 @@
     mobileSidebarOpen = false;
     if (typeof window !== 'undefined') {
       sessionStorage.setItem(TAB_KEY, tab);
-      window.location.hash = tab;
+      window.history.replaceState(null, '', '#/' + tab);
+      updatePageTitle(tab, $authStore.currentUser?.role);
     }
   }
 
@@ -63,11 +93,12 @@
 
     const handleHash = () => {
       if (!$authStore.currentUser) return;
-      const hash = window.location.hash.replace('#', '').trim();
+      const raw = extractTabFromUrl(window.location.hash);
       const allowed = getAllowedTabs($authStore.currentUser.role);
-      if (hash && allowed.includes(hash) && hash !== activeTab) {
-        activeTab = hash;
-        sessionStorage.setItem(TAB_KEY, hash);
+      if (raw && allowed.includes(raw) && raw !== activeTab) {
+        activeTab = raw;
+        sessionStorage.setItem(TAB_KEY, raw);
+        updatePageTitle(raw, $authStore.currentUser.role);
       }
     };
 
@@ -114,6 +145,7 @@
           </div>
         </div>
 
+        <!-- Top-Right: Name and NIM inside badge only -->
         <div class="d-flex align-items-center gap-2">
           <span class="fw-semibold text-dark small">
             {$authStore.currentUser.name}
