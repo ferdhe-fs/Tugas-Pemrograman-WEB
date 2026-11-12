@@ -16,7 +16,7 @@ export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
     password: 'password123',
     role: 'student',
     email: 'student@sibermu.ac.id',
-    department: 'Informatics Engineering',
+    department: 'Teknik Informatika',
     semester: 4
   },
   {
@@ -26,7 +26,7 @@ export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
     password: 'password123',
     role: 'lecturer',
     email: 'lecturer@sibermu.ac.id',
-    department: 'Informatics Engineering'
+    department: 'Teknik Informatika'
   }
 ];
 
@@ -67,6 +67,14 @@ function getInitialSession(): AuthState {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed?.currentUser) {
+        // Sync department with master registered accounts
+        const matched = REGISTERED_ACCOUNTS.find(
+          (a) => a.identifierNumber.toLowerCase() === parsed.currentUser.identifierNumber?.toLowerCase()
+        );
+        if (matched) {
+          parsed.currentUser.department = matched.department;
+          localStorage.setItem(SESSION_KEY, JSON.stringify(parsed));
+        }
         return { isAuthenticated: true, currentUser: parsed.currentUser };
       }
     }
