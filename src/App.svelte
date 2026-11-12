@@ -58,10 +58,10 @@
   }
 
   onMount(() => {
-    // Jeda halus 350ms agar animasi loading spinner tampil mulus saat refresh
+    // Jeda halus 300ms agar animasi loading transparan tampil tanpa menutupi menu
     const timer = setTimeout(() => {
       isPageLoading = false;
-    }, 350);
+    }, 300);
 
     const handleHashChange = () => {
       if (!$authStore.currentUser) return;
@@ -81,22 +81,8 @@
   });
 </script>
 
-{#if isPageLoading}
-  <!-- Animasi Loading Spinner Saat Halaman Dimuat / Di-refresh -->
-  <div class="app-loader-wrapper">
-    <div class="text-center">
-      <div
-        class="spinner-border text-primary mb-3"
-        style="width: 2.75rem; height: 2.75rem; border-width: 0.25rem;"
-        role="status"
-      >
-        <span class="visually-hidden">Memuat...</span>
-      </div>
-      <div class="fw-bold text-dark fs-6 tracking-wide">SIAKAD SiberMu</div>
-      <div class="text-muted" style="font-size: 0.78rem;">Universitas Siber Muhammadiyah</div>
-    </div>
-  </div>
-{:else if !$authStore.isAuthenticated || !$authStore.currentUser}
+<!-- Tampilan Utama (Menu & Dashboard Tetap Terlihat di Belakang) -->
+{#if !$authStore.isAuthenticated || !$authStore.currentUser}
   <Login />
 {:else}
   <div class="app-shell">
@@ -149,6 +135,22 @@
           onSelectTab={handleSelectTab}
         />
       </main>
+    </div>
+  </div>
+{/if}
+
+<!-- Overlay Loading Transparan & Sedikit Pudar (Tidak Menutupi Tampilan Menu) -->
+{#if isPageLoading}
+  <div class="app-loader-overlay">
+    <div class="app-loader-card text-center">
+      <div
+        class="spinner-border text-primary mb-2"
+        style="width: 2rem; height: 2rem; border-width: 0.2rem;"
+        role="status"
+      >
+        <span class="visually-hidden">Memuat...</span>
+      </div>
+      <div class="fw-semibold text-dark small">Memuat data...</div>
     </div>
   </div>
 {/if}
