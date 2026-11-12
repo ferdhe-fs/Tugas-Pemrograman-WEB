@@ -17,7 +17,24 @@
 
   let searchQuery = $state('');
   let filterApproval = $state<'All' | 'Menunggu' | 'Disetujui'>('All');
+  let isFilterDropdownOpen = $state(false);
   let showAddModal = $state(false);
+
+  function getFilterLabel(val: 'All' | 'Menunggu' | 'Disetujui'): string {
+    switch (val) {
+      case 'Menunggu':
+        return 'Status: Menunggu';
+      case 'Disetujui':
+        return 'Status: Disetujui';
+      default:
+        return 'Status: Semua';
+    }
+  }
+
+  function handleSelectFilter(val: 'All' | 'Menunggu' | 'Disetujui') {
+    filterApproval = val;
+    isFilterDropdownOpen = false;
+  }
 
   // Form input matkul mahasiswa
   let inputCode = $state('');
@@ -169,7 +186,7 @@
       </div>
 
       <div class="card card-simple overflow-hidden">
-        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+        <div class="p-3 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 bg-white">
           <input
             type="text"
             class="form-control form-control-sm"
@@ -177,7 +194,69 @@
             style="max-width: 250px;"
             bind:value={searchQuery}
           />
-          <small class="text-muted">Total: {filteredCourses.length} MK ({totalSks} SKS)</small>
+          <div class="d-flex align-items-center gap-2">
+            <!-- Filter Dropdown Mahasiswa -->
+            <div class="filter-dropdown-container">
+              <button
+                type="button"
+                class="filter-dropdown-btn"
+                onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
+              >
+                <i class="bi bi-funnel text-muted"></i>
+                <span>{getFilterLabel(filterApproval)}</span>
+                <i class="bi bi-chevron-down small text-muted ms-1"></i>
+              </button>
+
+              {#if isFilterDropdownOpen}
+                <button
+                  type="button"
+                  class="filter-dropdown-backdrop"
+                  aria-label="Tutup menu filter"
+                  tabindex="-1"
+                  onclick={() => (isFilterDropdownOpen = false)}
+                ></button>
+
+                <div class="filter-dropdown-menu">
+                  <button
+                    type="button"
+                    class="filter-item {filterApproval === 'All' ? 'selected' : ''}"
+                    onclick={() => handleSelectFilter('All')}
+                  >
+                    <span>Semua Status</span>
+                    <span class="badge badge-clean-neutral ms-auto">{courses.length}</span>
+                    {#if filterApproval === 'All'}
+                      <i class="bi bi-check2 text-primary ms-2"></i>
+                    {/if}
+                  </button>
+
+                  <button
+                    type="button"
+                    class="filter-item {filterApproval === 'Menunggu' ? 'selected' : ''}"
+                    onclick={() => handleSelectFilter('Menunggu')}
+                  >
+                    <span>Menunggu</span>
+                    <span class="badge badge-clean-neutral ms-auto">{pendingCourses.length}</span>
+                    {#if filterApproval === 'Menunggu'}
+                      <i class="bi bi-check2 text-primary ms-2"></i>
+                    {/if}
+                  </button>
+
+                  <button
+                    type="button"
+                    class="filter-item {filterApproval === 'Disetujui' ? 'selected' : ''}"
+                    onclick={() => handleSelectFilter('Disetujui')}
+                  >
+                    <span>Disetujui</span>
+                    <span class="badge badge-clean-neutral ms-auto">{approvedCourses.length}</span>
+                    {#if filterApproval === 'Disetujui'}
+                      <i class="bi bi-check2 text-primary ms-2"></i>
+                    {/if}
+                  </button>
+                </div>
+              {/if}
+            </div>
+            <small class="text-muted d-none d-sm-inline">({filteredCourses.length} MK)</small>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -387,28 +466,66 @@
           <h5 class="fw-bold text-dark mb-1">Validasi & Persetujuan KRS</h5>
           <p class="text-muted small mb-0">Tinjau rencana studi mahasiswa dan ubah status persetujuan</p>
         </div>
-        <div class="btn-group btn-group-sm">
+
+        <!-- Filter Dropdown (Hover & Low-Contrast Selected) -->
+        <div class="filter-dropdown-container">
           <button
             type="button"
-            class="btn {filterApproval === 'All' ? 'btn-primary' : 'btn-outline-secondary'}"
-            onclick={() => (filterApproval = 'All')}
+            class="filter-dropdown-btn"
+            onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
           >
-            Semua ({courses.length})
+            <i class="bi bi-funnel text-muted"></i>
+            <span>{getFilterLabel(filterApproval)}</span>
+            <i class="bi bi-chevron-down small text-muted ms-1"></i>
           </button>
-          <button
-            type="button"
-            class="btn {filterApproval === 'Menunggu' ? 'btn-primary' : 'btn-outline-secondary'}"
-            onclick={() => (filterApproval = 'Menunggu')}
-          >
-            Menunggu ({pendingCourses.length})
-          </button>
-          <button
-            type="button"
-            class="btn {filterApproval === 'Disetujui' ? 'btn-primary' : 'btn-outline-secondary'}"
-            onclick={() => (filterApproval = 'Disetujui')}
-          >
-            Disetujui ({approvedCourses.length})
-          </button>
+
+          {#if isFilterDropdownOpen}
+            <button
+              type="button"
+              class="filter-dropdown-backdrop"
+              aria-label="Tutup menu filter"
+              tabindex="-1"
+              onclick={() => (isFilterDropdownOpen = false)}
+            ></button>
+
+            <div class="filter-dropdown-menu">
+              <button
+                type="button"
+                class="filter-item {filterApproval === 'All' ? 'selected' : ''}"
+                onclick={() => handleSelectFilter('All')}
+              >
+                <span>Semua Status</span>
+                <span class="badge badge-clean-neutral ms-auto">{courses.length}</span>
+                {#if filterApproval === 'All'}
+                  <i class="bi bi-check2 text-primary ms-2"></i>
+                {/if}
+              </button>
+
+              <button
+                type="button"
+                class="filter-item {filterApproval === 'Menunggu' ? 'selected' : ''}"
+                onclick={() => handleSelectFilter('Menunggu')}
+              >
+                <span>Menunggu</span>
+                <span class="badge badge-clean-neutral ms-auto">{pendingCourses.length}</span>
+                {#if filterApproval === 'Menunggu'}
+                  <i class="bi bi-check2 text-primary ms-2"></i>
+                {/if}
+              </button>
+
+              <button
+                type="button"
+                class="filter-item {filterApproval === 'Disetujui' ? 'selected' : ''}"
+                onclick={() => handleSelectFilter('Disetujui')}
+              >
+                <span>Disetujui</span>
+                <span class="badge badge-clean-neutral ms-auto">{approvedCourses.length}</span>
+                {#if filterApproval === 'Disetujui'}
+                  <i class="bi bi-check2 text-primary ms-2"></i>
+                {/if}
+              </button>
+            </div>
+          {/if}
         </div>
       </div>
 
