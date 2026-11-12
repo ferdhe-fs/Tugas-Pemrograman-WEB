@@ -8,7 +8,7 @@ export interface RegisteredAccount extends User {
   password: string;
 }
 
-// Data akun resmi yang sudah terdaftar di sistem (hanya akun ini yang bisa login)
+// Data akun resmi bawaan yang terdaftar di sistem
 export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
   {
     id: 'usr-mhs-01',
@@ -36,24 +36,41 @@ export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
 ];
 
 function getStoredUsers(): RegisteredAccount[] {
+  // Gunakan Map agar akun resmi selalu tersedia & akun custom tetap terjaga
+  const userMap = new Map<string, RegisteredAccount>();
+
+  // 1. Selalu daftarkan akun resmi
+  for (const acc of REGISTERED_ACCOUNTS) {
+    userMap.set(acc.identifierNumber.trim().toLowerCase(), acc);
+  }
+
+  // 2. Baca dan gabungkan akun dari localStorage jika ada
   try {
     const raw = localStorage.getItem(USERS_REGISTRY_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+      if (Array.isArray(parsed)) {
+        for (const item of parsed) {
+          if (item && item.identifierNumber) {
+            const key = item.identifierNumber.trim().toLowerCase();
+            if (!userMap.has(key)) {
+              userMap.set(key, item);
+            }
+          }
+        }
       }
     }
   } catch (err) {
     console.error('Gagal membaca data pengguna:', err);
   }
-  // Simpan akun resmi ke storage
+
+  const list = Array.from(userMap.values());
   try {
-    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(REGISTERED_ACCOUNTS));
+    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(list));
   } catch (e) {
     console.error(e);
   }
-  return REGISTERED_ACCOUNTS;
+  return list;
 }
 
 function getInitialSession(): AuthState {
@@ -93,17 +110,17 @@ function createAuthStore() {
       const users = getStoredUsers();
       const trimmedNik = nikInput.trim().toLowerCase();
 
-      // Cari user berdasarkan NIK / NIM / NIDN atau username
+      // Cari user berdasarkan NIK / NIM / NIDN
       const matched = users.find(
         (acc) =>
-          acc.identifierNumber.toLowerCase() === trimmedNik ||
-          acc.username.toLowerCase() === trimmedNik
+          acc.identifierNumber.trim().toLowerCase() === trimmedNik ||
+          acc.username.trim().toLowerCase() === trimmedNik
       );
 
       if (!matched) {
         return {
           success: false,
-          message: 'Nomor Induk (NIK/NIM/NIDN) belum terdaftar di sistem SIAKAD.'
+          message: `Nomor Induk (${nikInput}) belum terdaftar di sistem SIAKAD.`
         };
       }
 
@@ -112,7 +129,7 @@ function createAuthStore() {
         const roleLabel = matched.role === 'dosen' ? 'Dosen' : 'Mahasiswa';
         return {
           success: false,
-          message: `Nomor Induk ini terdaftar sebagai ${roleLabel}. Silakan pilih peran yang sesuai.`
+          message: `Nomor Induk ${matched.identifierNumber} terdaftar sebagai ${roleLabel}. Silakan pilih tombol peran "${roleLabel}" di atas.`
         };
       }
 
@@ -139,6 +156,17 @@ function createAuthStore() {
         message: `Selamat datang, ${userProfile.name}!`,
         user: userProfile
       };
+    },
+
+    // Tambah akun langsung (jika user ingin mendaftarkan NIK aslinya)
+    registerDirectAccount: (acc: RegisteredAccount) => {
+      const users = getStoredUsers();
+      users.push(acc);
+      try {
+        localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(users));
+      } catch (e) {
+        console.error(e);
+      }
     },
 
     // Logout
