@@ -115,11 +115,11 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <span class="badge badge-clean-primary text-uppercase px-2 py-1">
-            {$authStore.currentUser.role}
-          </span>
-          <span class="small text-muted d-none d-sm-inline">
+          <span class="fw-semibold text-dark small">
             {$authStore.currentUser.name}
+          </span>
+          <span class="badge badge-clean-primary font-monospace px-2 py-1">
+            {$authStore.currentUser.identifierNumber}
           </span>
         </div>
       </div>

@@ -15,8 +15,8 @@ A modern, minimalist web application built with **Svelte 5** (Runes API), **Type
 
 | Role | ID Number (NIM / NIDN) | Password | User Name | Department |
 | :--- | :--- | :--- | :--- | :--- |
-| **Student** | `230101001` | `password123` | **MAHASISWA** | Teknik Informatika |
-| **Lecturer** | `0612048501` | `password123` | **DOSEN** | Teknik Informatika |
+| **Student** | `230101001` | `password123` | **MAHASISWA** | Sistem Informatika |
+| **Lecturer** | `0612048501` | `password123` | **DOSEN** | Sistem Informatika |
 
 ---
 

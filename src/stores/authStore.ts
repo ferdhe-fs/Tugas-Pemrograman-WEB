@@ -16,7 +16,7 @@ export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
     password: 'password123',
     role: 'student',
     email: 'student@sibermu.ac.id',
-    department: 'Teknik Informatika',
+    department: 'Sistem Informatika',
     semester: 4
   },
   {
@@ -26,7 +26,7 @@ export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
     password: 'password123',
     role: 'lecturer',
     email: 'lecturer@sibermu.ac.id',
-    department: 'Teknik Informatika'
+    department: 'Sistem Informatika'
   }
 ];
 
