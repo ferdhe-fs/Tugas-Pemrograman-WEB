@@ -74,36 +74,36 @@
   </div>
 
   <div class="table-responsive">
-    <table class="table table-simple">
+    <table class="table table-simple align-middle">
       <thead>
         <tr>
-          <th>No</th>
-          <th>Course Code</th>
-          <th>Course Title</th>
-          <th>Credits (SKS)</th>
-          <th>Grade</th>
-          <th class="text-end">Grade Point</th>
+          <th class="text-start">No</th>
+          <th class="text-start">Course Code</th>
+          <th class="text-start">Course Title</th>
+          <th class="text-start">Credits (SKS)</th>
+          <th class="text-start">Grade</th>
+          <th class="text-start">Grade Point</th>
         </tr>
       </thead>
       <tbody>
         {#each currentSemesterData.courses as crs, idx}
           <tr>
-            <td class="text-muted small">{idx + 1}</td>
-            <td class="font-monospace small text-muted">{crs.code}</td>
-            <td class="fw-semibold text-dark">{crs.name}</td>
-            <td>{crs.credits}</td>
-            <td>
+            <td class="text-start text-muted small">{idx + 1}</td>
+            <td class="text-start font-monospace small text-muted">{crs.code}</td>
+            <td class="text-start fw-semibold text-dark">{crs.name}</td>
+            <td class="text-start">{crs.credits}</td>
+            <td class="text-start">
               <span class="badge badge-clean-primary px-2 py-1">{crs.grade}</span>
             </td>
-            <td class="text-end fw-semibold font-monospace">{crs.point.toFixed(2)}</td>
+            <td class="text-start fw-semibold font-monospace">{crs.point.toFixed(2)}</td>
           </tr>
         {/each}
       </tbody>
       <tfoot>
         <tr class="table-light fw-semibold">
-          <td colspan="3" class="text-end">Semester Summary:</td>
-          <td>{currentSemesterData.totalCredits} SKS</td>
-          <td colspan="2" class="text-end">
+          <td colspan="3" class="text-start">Semester Summary</td>
+          <td class="text-start">{currentSemesterData.totalCredits} SKS</td>
+          <td colspan="2" class="text-start">
             Semester GPA: <span class="text-primary">{currentSemesterData.semesterGpa.toFixed(2)}</span>
           </td>
         </tr>
