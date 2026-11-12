@@ -119,18 +119,18 @@
           <label for="loginPass" class="form-label small fw-semibold text-secondary">
             Kata Sandi
           </label>
-          <div class="input-group">
+          <div class="input-group password-field-group">
             <input
               id="loginPass"
               type={showPassword ? 'text' : 'password'}
-              class="form-control border-end-0"
+              class="form-control"
               placeholder="Masukkan kata sandi"
               bind:value={loginPass}
               required
             />
             <button
               type="button"
-              class="btn btn-outline-secondary border-start-0"
+              class="btn-toggle-eye"
               aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
               onclick={() => (showPassword = !showPassword)}
             >
@@ -214,14 +214,24 @@
 
         <div class="mb-3">
           <label for="regPass" class="form-label small fw-semibold text-secondary">Kata Sandi</label>
-          <input
-            id="regPass"
-            type="password"
-            class="form-control form-control-sm"
-            placeholder="Buat kata sandi..."
-            bind:value={regPass}
-            required
-          />
+          <div class="input-group password-field-group">
+            <input
+              id="regPass"
+              type={showPassword ? 'text' : 'password'}
+              class="form-control form-control-sm"
+              placeholder="Buat kata sandi..."
+              bind:value={regPass}
+              required
+            />
+            <button
+              type="button"
+              class="btn-toggle-eye"
+              aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
+              onclick={() => (showPassword = !showPassword)}
+            >
+              <i class={showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'}></i>
+            </button>
+          </div>
         </div>
 
         <button

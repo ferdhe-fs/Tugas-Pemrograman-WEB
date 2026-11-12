@@ -32,6 +32,40 @@ body {
   background: #ffffff;
 }
 
+/* Seamless Password Input Group */
+.password-field-group {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  background-color: #ffffff;
+}
+
+.password-field-group:focus-within {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.password-field-group .form-control {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.password-field-group .btn-toggle-eye {
+  border: none !important;
+  background: transparent;
+  color: #64748b;
+  padding: 0.375rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-field-group .btn-toggle-eye:hover {
+  color: #1e293b;
+  background-color: #f8fafc;
+}
+
 /* Dashboard Styling */
 .dashboard-wrapper {
   min-height: 100vh;
