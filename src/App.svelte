@@ -32,6 +32,7 @@
     return 'overview';
   }
 
+  let isPageLoading = $state(true);
   let activeTab = $state('overview');
   let mobileSidebarOpen = $state(false);
 
@@ -57,6 +58,11 @@
   }
 
   onMount(() => {
+    // Jeda halus 350ms agar animasi loading spinner tampil mulus saat refresh
+    const timer = setTimeout(() => {
+      isPageLoading = false;
+    }, 350);
+
     const handleHashChange = () => {
       if (!$authStore.currentUser) return;
       const hash = window.location.hash.replace('#', '').trim();
@@ -69,12 +75,28 @@
 
     window.addEventListener('hashchange', handleHashChange);
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('hashchange', handleHashChange);
     };
   });
 </script>
 
-{#if !$authStore.isAuthenticated || !$authStore.currentUser}
+{#if isPageLoading}
+  <!-- Animasi Loading Spinner Saat Halaman Dimuat / Di-refresh -->
+  <div class="app-loader-wrapper">
+    <div class="text-center">
+      <div
+        class="spinner-border text-primary mb-3"
+        style="width: 2.75rem; height: 2.75rem; border-width: 0.25rem;"
+        role="status"
+      >
+        <span class="visually-hidden">Memuat...</span>
+      </div>
+      <div class="fw-bold text-dark fs-6 tracking-wide">SIAKAD SiberMu</div>
+      <div class="text-muted" style="font-size: 0.78rem;">Universitas Siber Muhammadiyah</div>
+    </div>
+  </div>
+{:else if !$authStore.isAuthenticated || !$authStore.currentUser}
   <Login />
 {:else}
   <div class="app-shell">
