@@ -15,13 +15,14 @@
     return role === 'lecturer' ? lecturerTabs : studentTabs;
   }
 
-  function extractTabFromUrl(hash: string): string {
-    return hash.replace(/^[#/]+/, '').trim();
+  function getPathSegment(): string {
+    if (typeof window === 'undefined') return '';
+    return window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase().trim();
   }
 
   function updatePageTitle(tab?: string, role?: string) {
     if (typeof document === 'undefined') return;
-    if (!tab) {
+    if (!tab || tab === 'login') {
       document.title = 'SIAKAD SiberMu - Sign In';
       return;
     }
@@ -41,8 +42,8 @@
   function resolveInitialTab(role?: string): string {
     const allowed = getAllowedTabs(role);
     if (typeof window !== 'undefined') {
-      const raw = extractTabFromUrl(window.location.hash);
-      if (raw && allowed.includes(raw)) return raw;
+      const pathSeg = getPathSegment();
+      if (pathSeg && allowed.includes(pathSeg)) return pathSeg;
       const saved = sessionStorage.getItem(TAB_KEY);
       if (saved && allowed.includes(saved)) return saved;
     }
@@ -54,19 +55,20 @@
   let mobileSidebarOpen = $state(false);
   let showLogoutModal = $state(false);
 
+  // Sync route and state on auth changes
   $effect(() => {
     if ($authStore.currentUser) {
       const initial = resolveInitialTab($authStore.currentUser.role);
       activeTab = initial;
       if (typeof window !== 'undefined') {
-        window.history.replaceState(null, '', '#/' + initial);
+        window.history.replaceState(null, '', '/' + initial);
         sessionStorage.setItem(TAB_KEY, initial);
         updatePageTitle(initial, $authStore.currentUser.role);
       }
     } else {
       if (typeof window !== 'undefined') {
-        window.history.replaceState(null, '', window.location.pathname);
-        updatePageTitle();
+        window.history.replaceState(null, '', '/login');
+        updatePageTitle('login');
       }
     }
   });
@@ -76,7 +78,7 @@
     mobileSidebarOpen = false;
     if (typeof window !== 'undefined') {
       sessionStorage.setItem(TAB_KEY, tab);
-      window.history.replaceState(null, '', '#/' + tab);
+      window.history.pushState(null, '', '/' + tab);
       updatePageTitle(tab, $authStore.currentUser?.role);
     }
   }
@@ -84,6 +86,10 @@
   function handleConfirmLogout() {
     showLogoutModal = false;
     authStore.logout();
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', '/login');
+      updatePageTitle('login');
+    }
   }
 
   onMount(() => {
@@ -91,21 +97,24 @@
       isPageLoading = false;
     }, 280);
 
-    const handleHash = () => {
-      if (!$authStore.currentUser) return;
-      const raw = extractTabFromUrl(window.location.hash);
-      const allowed = getAllowedTabs($authStore.currentUser.role);
-      if (raw && allowed.includes(raw) && raw !== activeTab) {
-        activeTab = raw;
-        sessionStorage.setItem(TAB_KEY, raw);
-        updatePageTitle(raw, $authStore.currentUser.role);
+    const handlePopState = () => {
+      if (!$authStore.currentUser) {
+        window.history.replaceState(null, '', '/login');
+        updatePageTitle('login');
+        return;
       }
+      const pathSeg = getPathSegment();
+      const allowed = getAllowedTabs($authStore.currentUser.role);
+      const target = allowed.includes(pathSeg) ? pathSeg : 'overview';
+      activeTab = target;
+      sessionStorage.setItem(TAB_KEY, target);
+      updatePageTitle(target, $authStore.currentUser.role);
     };
 
-    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('popstate', handlePopState);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('popstate', handlePopState);
     };
   });
 </script>

@@ -116,7 +116,9 @@ function createAuthStore() {
     logout: () => {
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('sibermu_active_tab');
-      if (typeof window !== 'undefined') window.location.hash = '';
+      if (typeof window !== 'undefined') {
+        window.history.replaceState(null, '', '/login');
+      }
       set({ isAuthenticated: false, currentUser: null });
     }
   };
