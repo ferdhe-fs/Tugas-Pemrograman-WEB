@@ -103,7 +103,7 @@
     </div>
     <button
       type="button"
-      class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 py-1"
+      class="btn btn-logout-clean btn-sm w-100 d-flex align-items-center justify-content-center gap-2 py-1"
       onclick={handleLogout}
     >
       <i class="bi bi-box-arrow-right"></i>

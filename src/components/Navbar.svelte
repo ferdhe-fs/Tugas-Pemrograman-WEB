@@ -38,7 +38,7 @@
 
         <button
           type="button"
-          class="btn btn-outline-secondary btn-sm px-3 py-1"
+          class="btn btn-logout-clean btn-sm px-3 py-1"
           onclick={handleLogout}
         >
           Keluar
