@@ -1,7 +1,7 @@
 # SIAKAD - Universitas Siber Muhammadiyah (SiberMu)
 > Tugas Pemrograman Web: Sistem Autentikasi Login & Dashboard Akademik Berbasis Peran
 
-Aplikasi web modern berbasis **Svelte 5** (versi terbaru), **TypeScript**, dan **Bootstrap 5** dengan tema warna tunggal **Navy Blue SiberMu**. Dilengkapi sistem sidebar adaptif yang memisahkan menu khusus untuk **Mahasiswa** dan **Dosen**.
+Aplikasi web modern berbasis **Svelte 5** (versi terbaru), **TypeScript**, dan **Bootstrap 5** dengan tema warna tunggal **Navy Blue SiberMu**.
 
 ---
 
@@ -11,42 +11,32 @@ Aplikasi web modern berbasis **Svelte 5** (versi terbaru), **TypeScript**, dan *
 
 ---
 
-## 🔑 Akun Demo Sementara (Untuk Pengujian)
+## 🔒 Sistem Autentikasi Login (Hanya Akun Terdaftar)
 
-Tersedia tombol akses cepat di halaman login atau gunakan data berikut:
+Sistem login tidak menyediakan menu pendaftaran mandiri (*no self-register*), melainkan menerapkan kontrol akses berbasis **Nomor Induk (NIK/NIM/NIDN)** dan **Peran (Role)** resmi yang sudah terdaftar di pangkalan data:
 
-| Peran (Role) | Username / ID | Kata Sandi | Nama Pengguna | Program Studi |
+| Peran (Role) | Nomor Induk (NIK / NIM / NIDN) | Kata Sandi | Nama Pengguna | Program Studi |
 | :--- | :--- | :--- | :--- | :--- |
-| **Mahasiswa** | `mahasiswa` atau `230101001` | `password123` | Ahmad Fauzan Syahputra | S1 Informatika |
-| **Dosen** | `dosen` atau `0612048501` | `password123` | Dr. Ir. Muhammad Arifin, M.Kom. | S1 Informatika |
+| **Mahasiswa** | `230101001` | `password123` | **Ahmad Fauzan Syahputra** | S1 Informatika |
+| **Dosen** | `0612048501` | `password123` | **Dr. Ir. Muhammad Arifin, M.Kom.** | S1 Informatika |
 
-> **Catatan:** Anda juga tetap dapat mendaftarkan akun baru secara mandiri melalui tombol *"Daftar di sini"*.
-
----
-
-## 📑 Data Mata Kuliah Sementara (Dummy KRS)
-
-Sistem sudah diisi data KRS awal agar dashboard langsung hidup dan siap diuji:
-
-1. `IF201` - **Pemrograman Berbasis Web** (3 SKS) &bull; Dosen: Dr. Ir. Muhammad Arifin, M.Kom. &bull; *Status: Disetujui*
-2. `IF203` - **Basis Data & SQL Terapan** (3 SKS) &bull; Dosen: Dewi Rahmawati, M.Cs. &bull; *Status: Disetujui*
-3. `IF205` - **Rekayasa Perangkat Lunak** (3 SKS) &bull; Dosen: Dr. Ir. Muhammad Arifin, M.Kom. &bull; *Status: Menunggu*
-4. `IF207` - **Keamanan Siber & Jaringan** (3 SKS) &bull; Dosen: Hadi Pranoto, M.T. &bull; *Status: Menunggu*
-
-*(Mata kuliah dengan status "Menunggu" dapat disetujui langsung oleh akun Dosen di menu **Validasi KRS Mahasiswa**).*
+> **Validasi Sistem:**
+> 1. Jika NIK tidak ditemukan di sistem, login akan ditolak.
+> 2. Jika NIK valid tetapi pilihan peran tidak cocok (misal: memasukkan NIK mahasiswa tetapi memilih peran Dosen), sistem akan menolak dan memberi peringatan.
+> 3. Kata sandi harus sesuai dengan NIK terdaftar.
 
 ---
 
 ## 👥 Fitur Menu Berdasarkan Peran
 
-### 🎓 Menu Mahasiswa:
-* **Ringkasan Studi:** Metrik beban SKS, SKS disetujui, dan ringkasan matkul.
+### 🎓 Menu Mahasiswa (Portal Mahasiswa):
+* **Ringkasan Studi:** Metrik beban SKS, SKS disetujui, dan ringkasan matkul terkini.
 * **Rencana Studi (KRS):** Mengambil mata kuliah baru, mencari matkul, dan menghapus.
 * **Jadwal Kuliah:** Jadwal mingguan sinkron otomatis dari matkul terdaftar.
 * **Transkrip Nilai (KHS):** Evaluasi progres SKS dan status her-registrasi.
 * **Biodata Mahasiswa:** Informasi identitas diri resmi mahasiswa.
 
-### 👨‍🏫 Menu Dosen:
+### 👨‍🏫 Menu Dosen (Portal Dosen):
 * **Ringkasan Mengajar:** Metrik jumlah pengajuan KRS yang perlu divalidasi.
 * **Validasi KRS Mahasiswa:** Tinjau dan setujui / batalkan rencana studi mahasiswa dengan 1 klik.
 * **Mata Kuliah Diampu:** Daftar mata kuliah yang dibimbing.
@@ -67,4 +57,4 @@ Sistem sudah diisi data KRS awal agar dashboard langsung hidup dan siap diuji:
 ```bash
 npm run dev
 ```
-Buka `http://localhost:5173` di browser Anda.
+Buka `http://localhost:5173` di peramban Anda.

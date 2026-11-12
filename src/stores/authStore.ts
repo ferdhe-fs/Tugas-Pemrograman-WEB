@@ -8,28 +8,28 @@ export interface RegisteredAccount extends User {
   password: string;
 }
 
-// Data dummy sementara yang realistis untuk pengujian
-export const INITIAL_DEMO_USERS: RegisteredAccount[] = [
+// Data akun resmi yang sudah terdaftar di sistem (hanya akun ini yang bisa login)
+export const REGISTERED_ACCOUNTS: RegisteredAccount[] = [
   {
     id: 'usr-mhs-01',
-    username: 'mahasiswa',
+    username: '230101001',
     password: 'password123',
     name: 'Ahmad Fauzan Syahputra',
     email: 'fauzan.mhs@sibermu.ac.id',
     role: 'mahasiswa',
-    identifierNumber: '230101001',
+    identifierNumber: '230101001', // NIK / NIM Mahasiswa
     department: 'S1 Informatika',
     semester: 4,
     avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ahmad+Fauzan'
   },
   {
     id: 'usr-dsn-01',
-    username: 'dosen',
+    username: '0612048501',
     password: 'password123',
     name: 'Dr. Ir. Muhammad Arifin, M.Kom.',
     email: 'm.arifin@sibermu.ac.id',
     role: 'dosen',
-    identifierNumber: '0612048501',
+    identifierNumber: '0612048501', // NIK / NIDN Dosen
     department: 'S1 Informatika',
     avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Muhammad+Arifin'
   }
@@ -45,19 +45,15 @@ function getStoredUsers(): RegisteredAccount[] {
       }
     }
   } catch (err) {
-    console.error('Gagal membaca data pengguna dari localStorage:', err);
+    console.error('Gagal membaca data pengguna:', err);
   }
-  // Pasang data dummy sementara jika belum ada akun
-  saveStoredUsers(INITIAL_DEMO_USERS);
-  return INITIAL_DEMO_USERS;
-}
-
-function saveStoredUsers(users: RegisteredAccount[]): void {
+  // Simpan akun resmi ke storage
   try {
-    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(users));
-  } catch (err) {
-    console.error('Gagal menyimpan data pengguna ke localStorage:', err);
+    localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(REGISTERED_ACCOUNTS));
+  } catch (e) {
+    console.error(e);
   }
+  return REGISTERED_ACCOUNTS;
 }
 
 function getInitialSession(): AuthState {
@@ -74,7 +70,7 @@ function getInitialSession(): AuthState {
       }
     }
   } catch (err) {
-    console.error('Gagal membaca sesi dari localStorage:', err);
+    console.error('Gagal membaca sesi:', err);
   }
   return {
     isAuthenticated: false,
@@ -88,53 +84,47 @@ function createAuthStore() {
   return {
     subscribe,
 
-    // Registrasi akun baru
-    register: (accountData: {
-      username: string;
-      password: string;
-      name: string;
-      email: string;
-      role: UserRole;
-      identifierNumber: string;
-      department: string;
-      semester?: number;
-    }): { success: boolean; message: string; user?: User } => {
+    // Login hanya dengan NIK dan Role yang sudah terdaftar
+    loginWithNikAndRole: (
+      nikInput: string,
+      passwordInput: string,
+      roleInput: UserRole
+    ): { success: boolean; message: string; user?: User } => {
       const users = getStoredUsers();
-      const trimmedUser = accountData.username.trim().toLowerCase();
-      const trimmedEmail = accountData.email.trim().toLowerCase();
-      const trimmedId = accountData.identifierNumber.trim();
+      const trimmedNik = nikInput.trim().toLowerCase();
 
-      const exists = users.some(
-        (u) =>
-          u.username.toLowerCase() === trimmedUser ||
-          u.email.toLowerCase() === trimmedEmail ||
-          u.identifierNumber === trimmedId
+      // Cari user berdasarkan NIK / NIM / NIDN atau username
+      const matched = users.find(
+        (acc) =>
+          acc.identifierNumber.toLowerCase() === trimmedNik ||
+          acc.username.toLowerCase() === trimmedNik
       );
 
-      if (exists) {
+      if (!matched) {
         return {
           success: false,
-          message: 'Username, Email, atau NIM/NIDN sudah terdaftar.'
+          message: 'Nomor Induk (NIK/NIM/NIDN) belum terdaftar di sistem SIAKAD.'
         };
       }
 
-      const newUser: RegisteredAccount = {
-        id: `usr-${Date.now()}`,
-        username: accountData.username.trim(),
-        password: accountData.password,
-        name: accountData.name.trim(),
-        email: accountData.email.trim(),
-        role: accountData.role,
-        identifierNumber: accountData.identifierNumber.trim(),
-        department: accountData.department.trim(),
-        semester: accountData.semester || 1,
-        avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(accountData.name.trim())}`
-      };
+      // Validasi kesesuaian peran
+      if (matched.role !== roleInput) {
+        const roleLabel = matched.role === 'dosen' ? 'Dosen' : 'Mahasiswa';
+        return {
+          success: false,
+          message: `Nomor Induk ini terdaftar sebagai ${roleLabel}. Silakan pilih peran yang sesuai.`
+        };
+      }
 
-      users.push(newUser);
-      saveStoredUsers(users);
+      // Validasi kata sandi
+      if (matched.password !== passwordInput) {
+        return {
+          success: false,
+          message: 'Kata sandi tidak sesuai. Silakan periksa kembali.'
+        };
+      }
 
-      const { password, ...userProfile } = newUser;
+      const { password, ...userProfile } = matched;
       const newState: AuthState = {
         isAuthenticated: true,
         currentUser: userProfile,
@@ -146,43 +136,8 @@ function createAuthStore() {
 
       return {
         success: true,
-        message: `Pendaftaran berhasil! Selamat datang, ${userProfile.name}.`,
+        message: `Selamat datang, ${userProfile.name}!`,
         user: userProfile
-      };
-    },
-
-    // Login
-    login: (usernameInput: string, passwordInput: string): { success: boolean; message: string; user?: User } => {
-      const users = getStoredUsers();
-      const trimmedUser = usernameInput.trim().toLowerCase();
-
-      const matched = users.find(
-        (acc) =>
-          (acc.username.toLowerCase() === trimmedUser ||
-            acc.email.toLowerCase() === trimmedUser ||
-            acc.identifierNumber.toLowerCase() === trimmedUser) &&
-          acc.password === passwordInput
-      );
-
-      if (matched) {
-        const { password, ...userProfile } = matched;
-        const newState: AuthState = {
-          isAuthenticated: true,
-          currentUser: userProfile,
-          token: `session-${Date.now()}`
-        };
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newState));
-        set(newState);
-        return {
-          success: true,
-          message: `Selamat datang kembali, ${userProfile.name}!`,
-          user: userProfile
-        };
-      }
-
-      return {
-        success: false,
-        message: 'Kredensial tidak sesuai. Gunakan akun coba sementara di bawah.'
       };
     },
 
