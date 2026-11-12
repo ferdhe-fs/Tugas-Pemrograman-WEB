@@ -23,11 +23,11 @@
   function getFilterLabel(val: 'All' | 'Menunggu' | 'Disetujui'): string {
     switch (val) {
       case 'Menunggu':
-        return 'Status: Menunggu';
+        return 'Menunggu';
       case 'Disetujui':
-        return 'Status: Disetujui';
+        return 'Disetujui';
       default:
-        return 'Status: Semua';
+        return 'Semua';
     }
   }
 
@@ -202,7 +202,6 @@
                 class="filter-dropdown-btn"
                 onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
               >
-                <i class="bi bi-funnel text-muted"></i>
                 <span>{getFilterLabel(filterApproval)}</span>
                 <i class="bi bi-chevron-down small text-muted ms-1"></i>
               </button>
@@ -222,10 +221,9 @@
                     class="filter-item {filterApproval === 'All' ? 'selected' : ''}"
                     onclick={() => handleSelectFilter('All')}
                   >
-                    <span>Semua Status</span>
-                    <span class="badge badge-clean-neutral ms-auto">{courses.length}</span>
+                    <span>Semua</span>
                     {#if filterApproval === 'All'}
-                      <i class="bi bi-check2 text-primary ms-2"></i>
+                      <i class="bi bi-check2 text-primary ms-auto"></i>
                     {/if}
                   </button>
 
@@ -235,9 +233,8 @@
                     onclick={() => handleSelectFilter('Menunggu')}
                   >
                     <span>Menunggu</span>
-                    <span class="badge badge-clean-neutral ms-auto">{pendingCourses.length}</span>
                     {#if filterApproval === 'Menunggu'}
-                      <i class="bi bi-check2 text-primary ms-2"></i>
+                      <i class="bi bi-check2 text-primary ms-auto"></i>
                     {/if}
                   </button>
 
@@ -247,15 +244,13 @@
                     onclick={() => handleSelectFilter('Disetujui')}
                   >
                     <span>Disetujui</span>
-                    <span class="badge badge-clean-neutral ms-auto">{approvedCourses.length}</span>
                     {#if filterApproval === 'Disetujui'}
-                      <i class="bi bi-check2 text-primary ms-2"></i>
+                      <i class="bi bi-check2 text-primary ms-auto"></i>
                     {/if}
                   </button>
                 </div>
               {/if}
             </div>
-            <small class="text-muted d-none d-sm-inline">({filteredCourses.length} MK)</small>
           </div>
         </div>
 
@@ -474,7 +469,6 @@
             class="filter-dropdown-btn"
             onclick={() => (isFilterDropdownOpen = !isFilterDropdownOpen)}
           >
-            <i class="bi bi-funnel text-muted"></i>
             <span>{getFilterLabel(filterApproval)}</span>
             <i class="bi bi-chevron-down small text-muted ms-1"></i>
           </button>
@@ -494,10 +488,9 @@
                 class="filter-item {filterApproval === 'All' ? 'selected' : ''}"
                 onclick={() => handleSelectFilter('All')}
               >
-                <span>Semua Status</span>
-                <span class="badge badge-clean-neutral ms-auto">{courses.length}</span>
+                <span>Semua</span>
                 {#if filterApproval === 'All'}
-                  <i class="bi bi-check2 text-primary ms-2"></i>
+                  <i class="bi bi-check2 text-primary ms-auto"></i>
                 {/if}
               </button>
 
@@ -507,9 +500,8 @@
                 onclick={() => handleSelectFilter('Menunggu')}
               >
                 <span>Menunggu</span>
-                <span class="badge badge-clean-neutral ms-auto">{pendingCourses.length}</span>
                 {#if filterApproval === 'Menunggu'}
-                  <i class="bi bi-check2 text-primary ms-2"></i>
+                  <i class="bi bi-check2 text-primary ms-auto"></i>
                 {/if}
               </button>
 
@@ -519,9 +511,8 @@
                 onclick={() => handleSelectFilter('Disetujui')}
               >
                 <span>Disetujui</span>
-                <span class="badge badge-clean-neutral ms-auto">{approvedCourses.length}</span>
                 {#if filterApproval === 'Disetujui'}
-                  <i class="bi bi-check2 text-primary ms-2"></i>
+                  <i class="bi bi-check2 text-primary ms-auto"></i>
                 {/if}
               </button>
             </div>
