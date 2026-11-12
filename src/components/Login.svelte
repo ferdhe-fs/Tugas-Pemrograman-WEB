@@ -151,6 +151,29 @@
             Masuk
           {/if}
         </button>
+
+        <!-- Tombol Coba Cepat Sementara -->
+        <div class="mt-3 pt-3 border-top text-center">
+          <div class="text-muted small mb-2" style="font-size: 0.72rem;">Coba Masuk Cepat (Data Sementara):</div>
+          <div class="d-flex justify-content-center gap-2">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary py-1 px-2"
+              style="font-size: 0.75rem;"
+              onclick={() => { loginUser = 'mahasiswa'; loginPass = 'password123'; }}
+            >
+              <i class="bi bi-person-fill me-1"></i> Akun Mahasiswa
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary py-1 px-2"
+              style="font-size: 0.75rem;"
+              onclick={() => { loginUser = 'dosen'; loginPass = 'password123'; }}
+            >
+              <i class="bi bi-person-workspace me-1"></i> Akun Dosen
+            </button>
+          </div>
+        </div>
       </form>
 
       <div class="text-center mt-4 pt-2 border-top">

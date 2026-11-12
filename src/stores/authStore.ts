@@ -8,16 +8,48 @@ export interface RegisteredAccount extends User {
   password: string;
 }
 
+// Data dummy sementara yang realistis untuk pengujian
+export const INITIAL_DEMO_USERS: RegisteredAccount[] = [
+  {
+    id: 'usr-mhs-01',
+    username: 'mahasiswa',
+    password: 'password123',
+    name: 'Ahmad Fauzan Syahputra',
+    email: 'fauzan.mhs@sibermu.ac.id',
+    role: 'mahasiswa',
+    identifierNumber: '230101001',
+    department: 'S1 Informatika',
+    semester: 4,
+    avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ahmad+Fauzan'
+  },
+  {
+    id: 'usr-dsn-01',
+    username: 'dosen',
+    password: 'password123',
+    name: 'Dr. Ir. Muhammad Arifin, M.Kom.',
+    email: 'm.arifin@sibermu.ac.id',
+    role: 'dosen',
+    identifierNumber: '0612048501',
+    department: 'S1 Informatika',
+    avatarUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Muhammad+Arifin'
+  }
+];
+
 function getStoredUsers(): RegisteredAccount[] {
   try {
     const raw = localStorage.getItem(USERS_REGISTRY_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
   } catch (err) {
     console.error('Gagal membaca data pengguna dari localStorage:', err);
   }
-  return [];
+  // Pasang data dummy sementara jika belum ada akun
+  saveStoredUsers(INITIAL_DEMO_USERS);
+  return INITIAL_DEMO_USERS;
 }
 
 function saveStoredUsers(users: RegisteredAccount[]): void {
@@ -56,7 +88,7 @@ function createAuthStore() {
   return {
     subscribe,
 
-    // Registrasi akun baru (tanpa data dummy, murni input pengguna)
+    // Registrasi akun baru
     register: (accountData: {
       username: string;
       password: string;
@@ -82,7 +114,7 @@ function createAuthStore() {
       if (exists) {
         return {
           success: false,
-          message: 'Username, Email, atau NIM/NIDN sudah terdaftar. Silakan gunakan yang lain.'
+          message: 'Username, Email, atau NIM/NIDN sudah terdaftar.'
         };
       }
 
@@ -114,22 +146,15 @@ function createAuthStore() {
 
       return {
         success: true,
-        message: `Pendaftaran berhasil! Selamat datang di SIAKAD Siber Muhammadiyah, ${userProfile.name}.`,
+        message: `Pendaftaran berhasil! Selamat datang, ${userProfile.name}.`,
         user: userProfile
       };
     },
 
-    // Login ke akun terdaftar
+    // Login
     login: (usernameInput: string, passwordInput: string): { success: boolean; message: string; user?: User } => {
       const users = getStoredUsers();
       const trimmedUser = usernameInput.trim().toLowerCase();
-
-      if (users.length === 0) {
-        return {
-          success: false,
-          message: 'Belum ada akun yang terdaftar di sistem. Silakan klik tab "Daftar Akun Baru" terlebih dahulu.'
-        };
-      }
 
       const matched = users.find(
         (acc) =>
@@ -157,7 +182,7 @@ function createAuthStore() {
 
       return {
         success: false,
-        message: 'Kombinasi kredensial salah atau pengguna tidak ditemukan.'
+        message: 'Kredensial tidak sesuai. Gunakan akun coba sementara di bawah.'
       };
     },
 
